@@ -1,72 +1,185 @@
 // server.js
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import { Anthropic } from '@anthropic-ai/sdk';
+import express from 'express'
+import cors from 'cors'
+import dotenv from 'dotenv'
 
-dotenv.config();
+dotenv.config()
 
-const app = express();
-app.use(cors());
-app.use(express.json());
+const app = express()
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+app.use(cors())
+app.use(express.json())
 
-// Cache بسيط للطلبات
-const cache = new Map();
+const GEMINI_MODELS = [
+  'gemini-3.6-flash',
+  'gemini-3.5-flash-lite'
+]
 
-app.post('/api/suggest-placeholders', async (req, res) => {
+// Simple in-memory cache
+const cache = new Map()
+
+app.post('/api/ai', async (req, res) => {
   try {
-    const { role, lang = 'ar' } = req.body;
+    const { prompt } = req.body
 
-    if (!role) {
-      return res.status(400).json({ error: 'Role is required' });
+    if (!prompt) {
+      return res.status(400).json({
+        error: 'Prompt is required'
+      })
     }
 
-    const cacheKey = `${role.toLowerCase().trim()}_${lang}`;
+    const cacheKey = prompt.trim()
+
     if (cache.has(cacheKey)) {
-      return res.json({ suggestions: cache.get(cacheKey), cached: true });
+      return res.json({
+        text: cache.get(cacheKey),
+        cached: true
+      })
     }
 
-    const isAr = lang === 'ar';
-    const prompt = `Return ONLY a valid JSON object (no markdown, no extra text) with tailored CV placeholder suggestions for the job role "${role}". Language MUST be ${isAr ? 'Arabic' : 'English'}.
-    Structure required:
-    {
-      "summary": "...",
-      "skills": "...",
-      "tools": "...",
-      "expTitle": "...",
-      "expDesc": "...",
-      "projTitle": "...",
-      "projDesc": "..."
-    }`;
+    let lastError = null
 
-    const response = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 500,
-      messages: [{ role: 'user', content: prompt }],
-    });
+for (const model of GEMINI_MODELS) {
+  try {
+    const url =
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`
 
-    const contentText = response.content[0].text;
-    const parsedData = JSON.parse(contentText);
+    const response = await fetch(url, {
+      method: 'POST',
 
-    // الحفظ في التخزين المؤقت
-    cache.set(cacheKey, parsedData);
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key':
+          process.env.GEMINI_API_KEY
+      },
 
-    return res.json({ suggestions: parsedData, cached: false });
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              {
+                text: prompt
+              }
+            ]
+          }
+        ]
+      })
+    })
+
+    const json = await response.json()
+
+    if (response.ok) {
+      const text =
+        json?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ||
+        ''
+
+      if (!text) {
+        throw new Error(
+          `Gemini ${model} returned an empty response`
+        )
+      }
+
+      cache.set(cacheKey, text)
+
+      return res.json({
+        text,
+        cached: false,
+        model
+      })
+    }
+
+    lastError = {
+      model,
+      status: response.status,
+      message:
+        json?.error?.message ||
+        'Gemini API request failed'
+    }
+
+    console.error(
+      `Gemini ${model} Error:`,
+      response.status,
+      json
+    )
+
+    // Try next model on temporary service errors
+    if (
+      response.status !== 429 &&
+      response.status !== 500 &&
+      response.status !== 502 &&
+      response.status !== 503 &&
+      response.status !== 504
+    ) {
+      break
+    }
   } catch (error) {
-    console.error('Proxy Error:', error);
-    // Fallback في حال حدوث خطأ
-    return res.status(500).json({ 
-      error: 'Failed to fetch suggestions',
-      fallback: true 
-    });
-  }
-});
+    lastError = {
+      model,
+      message: error.message
+    }
 
-const PORT = process.env.PORT || 3001;
+    console.error(
+      `Gemini ${model} Proxy Error:`,
+      error
+    )
+  }
+}
+
+return res.status(503).json({
+  error:
+    lastError?.message ||
+    'All Gemini models are temporarily unavailable'
+})
+
+    const json = await response.json()
+
+    if (!response.ok) {
+      console.error(
+        'Gemini API Error:',
+        response.status,
+        json
+      )
+
+      return res.status(response.status).json({
+        error:
+          json?.error?.message ||
+          'Gemini API request failed'
+      })
+    }
+
+    const text =
+      json?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ||
+      ''
+
+    if (!text) {
+      throw new Error(
+        'Gemini returned an empty response'
+      )
+    }
+
+    cache.set(cacheKey, text)
+
+    return res.json({
+      text,
+      cached: false
+    })
+  } catch (error) {
+    console.error(
+      'Gemini Proxy Error:',
+      error
+    )
+
+    return res.status(500).json({
+      error: 'Failed to process AI request'
+    })
+  }
+})
+
+const PORT =
+  process.env.PORT || 3001
+
 app.listen(PORT, () => {
-  console.log(`Backend Proxy Server running on port ${PORT}`);
-});
+  console.log(
+    `Backend Proxy Server running on port ${PORT}`
+  )
+})

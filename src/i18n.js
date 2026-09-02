@@ -1,36 +1,260 @@
-// src/i18n.js
-export const translations = {
-  ar: {
-    title: "Career Copilot - منشئ السيرة الذاتية الذكي",
-    jobRoleLabel: "المسمى الوظيفي",
-    jobRolePlaceholder: "مثال: مطور واجهات أمامية، مدير تسويق...",
-    customizingText: "✦ جاري تخصيص الأمثلة عبر الذكاء الاصطناعي...",
-    summaryLabel: "الملخص المهني",
-    skillsLabel: "المهارات الأساسية",
-    toolsLabel: "الأدوات والشهادات",
-    experienceLabel: "الخبرة العملية",
-    projectLabel: "المشاريع المميزة",
-    switchLang: "English",
-    dir: "rtl"
-  },
-  en: {
-    title: "Career Copilot - AI Resume Builder",
-    jobRoleLabel: "Job Title / Role",
-    jobRolePlaceholder: "e.g. Frontend Developer, Marketing Manager...",
-    customizingText: "✦ Tailoring dynamic placeholders...",
-    summaryLabel: "Professional Summary",
-    skillsLabel: "Core Skills",
-    toolsLabel: "Tools & Certifications",
-    experienceLabel: "Work Experience",
-    projectLabel: "Featured Projects",
-    switchLang: "العربية",
-    dir: "ltr"
-  }
-};
+const ROLE_SAMPLES_EN = [
+  'Frontend Developer',
+  'Registered Nurse',
+  'Marketing Manager',
+  'Civil Engineer',
+  'High School Teacher'
+]
 
-export function setLanguage(lang) {
-  const config = translations[lang] || translations.ar;
-  document.documentElement.lang = lang;
-  document.documentElement.dir = config.dir; // تطبيق الاتجاه على الكود بالكامل
-  return config;
+const ROLE_SAMPLES_AR = [
+  'مطور واجهات أمامية',
+  'ممرض مسجل',
+  'مدير تسويق',
+  'مهندس مدني',
+  'معلم مدرسة ثانوية'
+]
+
+const translations = {
+  en: {
+    eyebrowInput: 'career-copilot / input',
+    eyebrowWorkbench: 'the workbench',
+    workbenchTitle: 'Build on one side. Read it on the other.',
+    workbenchDesc:
+      "Every field updates the document live — there's no hidden \"generate\" step. Use Polish on any text field to let AI tighten your wording into resume-ready phrasing, whatever your field.",
+    headline:
+      'Stop writing your resume from a <em>blank page.</em>',
+    sub:
+      'Works for any profession. Feed in your raw experience — nursing, teaching, sales, engineering, anything — and watch it compile into a document that reads like you belong in the role.',
+    ctaStart: 'Start compiling',
+    heroPlaceholderName: 'Your Name Here',
+
+    steps: [
+      'Personal',
+      'Summary',
+      'Experience',
+      'Skills',
+      'Projects'
+    ],
+
+    fullName: 'Full name',
+    fullNamePh: 'Jordan Rivera',
+
+    targetRole: 'Target role',
+    targetRolePh:
+      'e.g. Registered Nurse, Marketing Manager, Civil Engineer',
+
+    email: 'Email',
+
+    location: 'Location',
+    locationPh: 'City, Country',
+
+    links: 'Links (optional, comma separated)',
+    linksPh:
+      'linkedin.com/in/you, portfolio.com',
+
+    summaryLabel:
+      'Rough summary — write it however it comes out',
+
+    summaryPh:
+      "e.g. I've been in customer support for 3 years, good at de-escalating angry callers, recently started training new hires...",
+
+    polish: '✦ Polish with AI',
+    compiling: 'Compiling…',
+    polishedLabel: 'Polished',
+
+    suggesting:
+      '✦ Tailoring examples to this role…',
+
+    suggestedFor:
+      '✦ Examples tailored for',
+
+    remove: 'remove',
+
+    expTitle: 'Title & organization',
+    expTitlePh:
+      'e.g. Shift Supervisor, Riverside Cafe',
+
+    period: 'Period',
+    periodPh: 'Jan 2023 — Present',
+
+    expDesc: 'What you did (rough is fine)',
+    expDescPh:
+      'e.g. ran the morning shift, trained 4 new staff, cut wait times somehow',
+
+    addExperience: '+ Add experience',
+
+    coreSkills: 'Core skills',
+    coreSkillsPh:
+      'e.g. Patient care, conflict resolution, budgeting',
+
+    toolsSkills: 'Tools & certifications',
+    toolsSkillsPh:
+      'e.g. Excel, Epic EMR, PMP certified',
+
+    projName: 'Project / achievement name',
+    projNamePh:
+      'e.g. Community outreach program',
+
+    projDesc: 'One-line description',
+    projDescPh:
+      'e.g. Organized a fundraiser that reached 500 families',
+
+    addProject: '+ Add project',
+
+    back: '← Back',
+    next: 'Next →',
+    exportPdf: 'Export PDF',
+
+    livePreview: 'live preview',
+
+    summarySection: 'Summary',
+    experienceSection: 'Experience',
+    skillsSection: 'Skills',
+    projectsSection: 'Projects',
+
+    contactPh: 'email · location · links',
+
+    emptyState:
+      'Start typing on the left — this page compiles as you go.',
+
+    footer:
+      'career-copilot · MVP prototype · built with Vue 3'
+  },
+
+  ar: {
+    eyebrowInput: 'career-copilot / الإدخال',
+    eyebrowWorkbench: 'مساحة العمل',
+
+    workbenchTitle:
+      'اكتب من جهة، واقرأ النتيجة من الجهة الأخرى.',
+
+    workbenchDesc:
+      'كل حقل يحدّث المستند مباشرة — لا توجد خطوة "توليد" مخفية. استخدم "صياغة بالذكاء الاصطناعي" على أي حقل نصي لتحسين صياغتك وتحويلها إلى نص مناسب للسيرة الذاتية، مهما كان مجالك.',
+
+    headline:
+      'توقف عن كتابة سيرتك الذاتية من <em>صفحة فارغة.</em>',
+
+    sub:
+      'يعمل مع أي مهنة. أدخل خبرتك الأولية — التمريض، التعليم، المبيعات، الهندسة، أي مجال — وشاهدها تتحول إلى مستند يعكس ملاءمتك للوظيفة.',
+
+    ctaStart: 'ابدأ البناء',
+
+    heroPlaceholderName: 'اسمك هنا',
+
+    steps: [
+      'البيانات الشخصية',
+      'الملخص',
+      'الخبرات',
+      'المهارات',
+      'المشاريع'
+    ],
+
+    fullName: 'الاسم الكامل',
+    fullNamePh: 'مثال: ياسر أحمد',
+
+    targetRole: 'المسمى الوظيفي المستهدف',
+    targetRolePh:
+      'مثال: ممرض، مدير تسويق، مهندس مدني',
+
+    email: 'البريد الإلكتروني',
+
+    location: 'الموقع',
+    locationPh: 'المدينة، الدولة',
+
+    links: 'الروابط (اختياري، مفصولة بفواصل)',
+    linksPh:
+      'linkedin.com/in/you, portfolio.com',
+
+    summaryLabel:
+      'الملخص الأولي — اكتبه بالطريقة التي تأتيك',
+
+    summaryPh:
+      'مثال: لدي 3 سنوات من الخبرة في خدمة العملاء، أجيد التعامل مع العملاء الغاضبين، وبدأت مؤخرًا بتدريب الموظفين الجدد...',
+
+    polish: '✦ صياغة بالذكاء الاصطناعي',
+    compiling: 'جاري الصياغة…',
+    polishedLabel: 'الصياغة المحسّنة',
+
+    suggesting:
+      '✦ جارٍ تخصيص الأمثلة لهذه الوظيفة…',
+
+    suggestedFor:
+      '✦ أمثلة مخصصة لـ',
+
+    remove: 'حذف',
+
+    expTitle: 'المسمى الوظيفي والمؤسسة',
+    expTitlePh:
+      'مثال: مشرف مناوبة، مقهى ريفرسايد',
+
+    period: 'الفترة',
+    periodPh: 'يناير 2023 — حتى الآن',
+
+    expDesc: 'ماذا فعلت؟ (الصياغة الأولية تكفي)',
+    expDescPh:
+      'مثال: أدرت المناوبة الصباحية، دربت 4 موظفين جدد، وخفضت وقت الانتظار',
+
+    addExperience: '+ إضافة خبرة',
+
+    coreSkills: 'المهارات الأساسية',
+    coreSkillsPh:
+      'مثال: رعاية المرضى، حل النزاعات، إعداد الميزانيات',
+
+    toolsSkills: 'الأدوات والشهادات',
+    toolsSkillsPh:
+      'مثال: Excel، Epic EMR، شهادة PMP',
+
+    projName: 'اسم المشروع / الإنجاز',
+    projNamePh:
+      'مثال: برنامج للتواصل المجتمعي',
+
+    projDesc: 'وصف في سطر واحد',
+    projDescPh:
+      'مثال: نظمت حملة تبرعات وصلت إلى 500 عائلة',
+
+    addProject: '+ إضافة مشروع',
+
+    back: '← رجوع',
+    next: 'التالي →',
+    exportPdf: 'تصدير PDF',
+
+    livePreview: 'المعاينة المباشرة',
+
+    summarySection: 'الملخص',
+    experienceSection: 'الخبرات',
+    skillsSection: 'المهارات',
+    projectsSection: 'المشاريع',
+
+    contactPh:
+      'البريد الإلكتروني · الموقع · الروابط',
+
+    emptyState:
+      'ابدأ بالكتابة على اليسار — ستُبنى الصفحة أمامك مباشرة.',
+
+    footer:
+      'career-copilot · نموذج MVP · مبني باستخدام Vue 3'
+  }
+}
+
+function setLanguage(lang) {
+  const config =
+    translations[lang] ||
+    translations.ar
+
+  document.documentElement.lang =
+    lang
+
+  document.documentElement.dir =
+    lang === 'ar'
+      ? 'rtl'
+      : 'ltr'
+
+  return config
+}
+
+export {
+  translations as I18N,
+  ROLE_SAMPLES_EN,
+  ROLE_SAMPLES_AR,
+  setLanguage
 }
