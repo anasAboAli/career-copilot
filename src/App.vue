@@ -49,8 +49,6 @@
       </div>
 
       <Workbench>
-        <!-- INPUT PANEL -->
-        <div class="panel-input">
           <!-- Step 0: Personal -->
           <PersonalStep v-if="stepIndex === 0" />
 
@@ -65,7 +63,7 @@
 
           <!-- Step 4: Projects -->
           <ProjectsStep v-if="stepIndex === 4" />
-        </div>
+
       </Workbench>
     </section>
 
@@ -76,141 +74,86 @@
 </template>
 
 <script setup>
-import LangSwitch from "./components/LangSwitch.vue";
-import HeroSection from "./components/HeroSection.vue";
-import Workbench from "./components/Workbench.vue";
-import PersonalStep from "./components/steps/PersonalStep.vue";
-import SummaryStep from "./components/steps/SummaryStep.vue";
-import ExperienceStep from "./components/steps/ExperienceStep.vue";
-import SkillsStep from "./components/steps/SkillsStep.vue";
-import ProjectsStep from "./components/steps/ProjectsStep.vue";
+import { ref, computed, watch } from 'vue'
 
-import { ref, computed, watch } from "vue";
+import LangSwitch from './components/LangSwitch.vue'
+import HeroSection from './components/HeroSection.vue'
+import Workbench from './components/Workbench.vue'
 
-import { I18N, ROLE_SAMPLES_EN, ROLE_SAMPLES_AR } from "./i18n.js";
+import PersonalStep from './components/steps/PersonalStep.vue'
+import SummaryStep from './components/steps/SummaryStep.vue'
+import ExperienceStep from './components/steps/ExperienceStep.vue'
+import SkillsStep from './components/steps/SkillsStep.vue'
+import ProjectsStep from './components/steps/ProjectsStep.vue'
 
-import { useResumeStore } from "./stores/resume.js";
+import { I18N } from './i18n.js'
 
-const appSection = ref(null);
+import { useResumeStore } from './stores/resume.js'
 
-const resume = useResumeStore();
+const resume = useResumeStore()
 
-const dynamicPh = computed(() => resume.dynamicPh);
-
-const suggested = computed(() => resume.suggested);
-
-const suggesting = computed(() => resume.suggesting);
+const appSection = ref(null)
 
 const lang = computed({
   get: () => resume.lang,
-  set: (value) => {
-    resume.setLanguage(value);
-  },
-});
+  set: value => {
+    resume.setLanguage(value)
+  }
+})
 
 const stepIndex = computed({
   get: () => resume.stepIndex,
-  set: (value) => {
-    resume.setStep(value);
-  },
-});
+  set: value => {
+    resume.setStep(value)
+  }
+})
 
-const polishing = computed({
-  get: () => resume.polishing,
-  set: (value) => {
-    resume.polishing = value;
-  },
-});
+const data = resume.data
 
-const data = resume.data;
+const dir = computed(() => resume.dir)
 
-const dir = computed(() => resume.dir);
+const t = computed(() => I18N[lang.value])
 
-const t = computed(() => I18N[lang.value]);
-
-const allSkills = computed(() => resume.allSkills);
-
-const hasExperience = computed(() => resume.hasExperience);
-
-const hasProjects = computed(() => resume.hasProjects);
-
-/* ---------------------------------
-   Role-aware placeholders
----------------------------------- */
-
-const PH_KEYS = [
-  "summaryPh",
-  "coreSkillsPh",
-  "toolsSkillsPh",
-  "expTitlePh",
-  "expDescPh",
-  "projNamePh",
-  "projDescPh",
-];
-
-const ph = computed(() => {
-  const base = {};
-
-  PH_KEYS.forEach((key) => {
-    base[key] = t.value[key];
-  });
-
-  return dynamicPh.value
-    ? {
-        ...base,
-        ...dynamicPh.value,
-      }
-    : base;
-});
-
-/* ---------------------------------
-   Hero animation
----------------------------------- */
-
-let roleDebounce = null;
+let roleDebounce = null
 
 watch(
   () => data.role,
-  (role) => {
-    clearTimeout(roleDebounce);
+  role => {
+    clearTimeout(roleDebounce)
 
     if (!role || role.trim().length < 3) {
-      resume.dynamicPh = null;
-      resume.suggested = false;
-      return;
+      resume.dynamicPh = null
+      resume.suggested = false
+      return
     }
 
     roleDebounce = setTimeout(() => {
-      resume.fetchRoleSuggestions(role, lang.value);
-    }, 700);
-  },
-);
-
-watch(lang, () => {
-  if (data.role && data.role.trim().length >= 3) {
-    resume.fetchRoleSuggestions(data.role, lang.value);
+      resume.fetchRoleSuggestions(
+        role,
+        lang.value
+      )
+    }, 700)
   }
-});
+)
 
-/* ---------------------------------
-   Actions
----------------------------------- */
+watch(
+  lang,
+  () => {
+    if (
+      data.role &&
+      data.role.trim().length >= 3
+    ) {
+      resume.fetchRoleSuggestions(
+        data.role,
+        lang.value
+      )
+    }
+  }
+)
 
 function scrollToApp() {
   appSection.value?.scrollIntoView({
-    behavior: "smooth",
-  });
+    behavior: 'smooth'
+  })
 }
-
-function printDoc() {
-  window.print();
-}
-
-/* ---------------------------------
-   Gemini API
----------------------------------- */
-
-/* ---------------------------------
-   AI Polish
----------------------------------- */
 </script>
