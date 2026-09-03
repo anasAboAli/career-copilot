@@ -18,7 +18,7 @@
       <input
         type="text"
         v-model="data.role"
-        :placeholder="t.targetRolePh"
+        :placeholder="rolePlaceholder"
       />
 
       <span
@@ -96,4 +96,14 @@ const suggesting = computed(() =>
 const suggested = computed(() =>
   resume.suggested
 )
+
+const dynamicPh = computed(() =>
+  resume.dynamicPh
+)
+
+const rolePlaceholder = computed(() =>
+  dynamicPh.value?.expTitlePh ||
+  t.value.targetRolePh
+)
+
 </script>
