@@ -1,23 +1,14 @@
 <template>
   <div class="panel-preview">
-
     <div class="preview-toolbar">
       <span class="preview-label">
         {{ t.livePreview }}
       </span>
 
-      <button
-        class="export-btn"
-        @click="printDoc"
-      >
-        {{ t.exportPdf }} ↓
-      </button>
+      <button class="export-btn" @click="exportPDF">{{ t.exportPdf }} ↓</button>
     </div>
 
-    <div
-      class="doc"
-      id="printDoc"
-    >
+    <div class="doc" id="printDoc">
       <div class="doc-name">
         {{ data.name || t.heroPlaceholderName }}
       </div>
@@ -28,33 +19,20 @@
 
       <div class="doc-contact">
         {{
-          [
-            data.email,
-            data.location,
-            data.links
-          ]
+          [data.email, data.location, data.links]
             .filter(Boolean)
-            .join('  ·  ')
-          || t.contactPh
+            .join("  ·  ") || t.contactPh
         }}
       </div>
 
       <!-- Summary -->
-      <template
-        v-if="
-          data.summaryPolished ||
-          data.summaryRaw
-        "
-      >
+      <template v-if="data.summaryPolished || data.summaryRaw">
         <div class="doc-section-title">
           {{ t.summarySection }}
         </div>
 
         <div class="doc-body">
-          {{
-            data.summaryPolished ||
-            data.summaryRaw
-          }}
+          {{ data.summaryPolished || data.summaryRaw }}
         </div>
       </template>
 
@@ -87,22 +65,13 @@
       </template>
 
       <!-- Skills -->
-      <template
-        v-if="
-          data.skillsCore ||
-          data.skillsTools
-        "
-      >
+      <template v-if="data.skillsCore || data.skillsTools">
         <div class="doc-section-title">
           {{ t.skillsSection }}
         </div>
 
         <div>
-          <span
-            class="doc-skill-tag"
-            v-for="skill in allSkills"
-            :key="skill"
-          >
+          <span class="doc-skill-tag" v-for="skill in allSkills" :key="skill">
             {{ skill }}
           </span>
         </div>
@@ -134,11 +103,7 @@
 
       <!-- Empty state -->
       <div
-        v-if="
-          !data.name &&
-          !data.summaryRaw &&
-          !hasExperience
-        "
+        v-if="!data.name && !data.summaryRaw && !hasExperience"
         class="doc-empty"
       >
         {{ t.emptyState }}
@@ -148,31 +113,60 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { I18N } from '../i18n.js'
-import { useResumeStore } from '../stores/resume.js'
+import { computed } from "vue";
+import { I18N } from "../i18n.js";
+import { useResumeStore } from "../stores/resume.js";
+import { buildResumeHTML } from "../pdf/resumeTemplate.js";
 
-const resume = useResumeStore()
+const resume = useResumeStore();
 
-const lang = computed(() => resume.lang)
+const lang = computed(() => resume.lang);
 
-const t = computed(() => I18N[lang.value])
+const t = computed(() => I18N[lang.value]);
 
-const data = resume.data
+const data = resume.data;
 
-const allSkills = computed(() =>
-  resume.allSkills
-)
+const allSkills = computed(() => resume.allSkills);
 
-const hasExperience = computed(() =>
-  resume.hasExperience
-)
+const hasExperience = computed(() => resume.hasExperience);
 
-const hasProjects = computed(() =>
-  resume.hasProjects
-)
+const hasProjects = computed(() => resume.hasProjects);
 
-function printDoc() {
-  window.print()
+async function exportPDF() {
+  try {
+    const html = buildResumeHTML(resume.data, resume.lang);
+
+    const response = await fetch("/api/pdf", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        html,
+        name: resume.data.name,
+        lang: resume.lang,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`PDF request failed: ${response.status}`);
+    }
+
+    const blob = await response.blob();
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "resume.pdf";
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("PDF export error:", error);
+  }
 }
 </script>

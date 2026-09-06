@@ -2,6 +2,8 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import puppeteer from 'puppeteer'
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
 
 dotenv.config()
 
@@ -9,6 +11,58 @@ const app = express()
 
 app.use(cors())
 app.use(express.json())
+
+app.post('/api/pdf', async (req, res) => {
+  try {
+    const {
+  html,
+  name,
+  lang
+} = req.body
+
+    if (!html || !html.trim()) {
+      return res.status(400).json({
+        error: 'HTML is required'
+      })
+    }
+
+    const browser = await puppeteer.launch({
+      headless: true
+    })
+
+    const page = await browser.newPage()
+
+    await page.setContent(html, {
+      waitUntil: 'networkidle0'
+    })
+const pdf = await page.pdf({
+  format: 'A4',
+  printBackground: true,
+  preferCSSPageSize: true
+})
+const pdfBuffer = Buffer.from(pdf)
+
+    await browser.close()
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition':
+        'attachment; filename="resume.pdf"',
+      'Content-Length': pdfBuffer.length
+    })
+
+    res.send(pdfBuffer)
+  } catch (error) {
+    console.error(
+      'PDF generation error:',
+      error
+    )
+
+    res.status(500).json({
+      error: 'Failed to generate PDF'
+    })
+  }
+})
 
 const GEMINI_MODELS = [
   'gemini-3.6-flash',

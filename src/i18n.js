@@ -99,6 +99,9 @@ const translations = {
     projDescPh:
       'e.g. Organized a fundraiser that reached 500 families',
 
+    projLink: 'Project link',
+    projLinkPh: 'https://example.com',
+
     addProject: '+ Add project',
 
     back: '← Back',
@@ -118,7 +121,34 @@ const translations = {
       'Start typing on the left — this page compiles as you go.',
 
     footer:
-      'career-copilot · MVP prototype · built with Vue 3'
+      'career-copilot · MVP prototype · built with Vue 3',
+
+    reset: 'Reset',
+    resetConfirm: 'Are you sure you want to clear your resume and start over?',
+  
+    loginTitle: 'Welcome to Career Copilot',
+    authEmail: 'Email',
+    authPassword: 'Password',
+    authLogin: 'Login',
+    authRegister: 'Register',
+    authLoading: 'Loading...',
+    authLoginSuccess: 'Login successful.',
+    authRegisterSuccess: 'Registration successful.',
+
+    registerTitle: 'Create your Career Copilot account',
+registerSubtitle:
+  'Save your resume securely and access it from anywhere.',
+
+  loginSubtitle:
+  'Sign in to access your saved resume.',
+
+  authNoAccount: "Don't have an account?",
+authCreateAccount: 'Create an account',
+
+authHaveAccount: 'Already have an account?',
+authLoginLink: 'Log in',
+authLogout: 'Logout',
+
   },
 
   ar: {
@@ -212,6 +242,9 @@ const translations = {
     projDescPh:
       'مثال: نظمت حملة تبرعات وصلت إلى 500 عائلة',
 
+    projLink: 'رابط المشروع',
+projLinkPh: 'https://example.com',
+
     addProject: '+ إضافة مشروع',
 
     back: '← رجوع',
@@ -232,7 +265,35 @@ const translations = {
       'ابدأ بالكتابة على اليسار — ستُبنى الصفحة أمامك مباشرة.',
 
     footer:
-      'career-copilot · نموذج MVP · مبني باستخدام Vue 3'
+      'career-copilot · نموذج MVP · مبني باستخدام Vue 3',
+
+    reset: 'إعادة ضبط',
+    resetConfirm: 'هل أنت متأكد أنك تريد مسح بيانات السيرة الذاتية والبدء من جديد؟',
+  
+    loginTitle: 'مرحبًا بك في Career Copilot',
+    authEmail: 'البريد الإلكتروني',
+    authPassword: 'كلمة المرور',
+    authLogin: 'تسجيل الدخول',
+    authRegister: 'إنشاء حساب',
+    authLoading: 'جارٍ التحميل...',
+    authLoginSuccess: 'تم تسجيل الدخول بنجاح.',
+    authRegisterSuccess: 'تم إنشاء الحساب بنجاح.',
+
+    registerTitle: 'أنشئ حسابك في Career Copilot',
+registerSubtitle:
+  'احفظ سيرتك الذاتية بأمان واصل إليها من أي مكان.',
+
+    loginSubtitle:
+  'سجّل الدخول للوصول إلى سيرتك الذاتية المحفوظة.',
+
+  authNoAccount: 'ليس لديك حساب؟',
+authCreateAccount: 'إنشاء حساب',
+
+authHaveAccount: 'لديك حساب بالفعل؟',
+authLoginLink: 'تسجيل الدخول',
+
+authLogout: 'تسجيل الخروج',
+
   }
 }
 

@@ -1,0 +1,49 @@
+import { createRouter, createWebHistory } from 'vue-router'
+
+import LoginView from './views/LoginView.vue'
+import RegisterView from './views/RegisterView.vue'
+import {
+  getCurrentUser,
+  waitForAuthReady
+} from './services/auth.service.js'
+
+const routes = [
+  {
+    path: '/login',
+    component: LoginView
+  },
+  {
+  path: '/register',
+  component: RegisterView
+},
+  {
+    path: '/',
+    component: () =>
+      import('./views/ResumeView.vue')
+  }
+]
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes
+})
+
+router.beforeEach(async (to) => {
+  const user = await waitForAuthReady()
+
+  if (to.path === '/' && !user) {
+    return '/login'
+  }
+
+  if (
+  (to.path === '/login' ||
+    to.path === '/register') &&
+  user
+) {
+  return '/'
+}
+
+  return true
+})
+
+export default router
