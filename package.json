@@ -4,11 +4,11 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "server": "node server.js",
-    "start": "concurrently \"npm run server\" \"npm run dev\""
-  },
+  "dev": "vite",
+  "build": "vite build",
+  "server": "node server.js",
+  "start": "node server.js"
+},
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

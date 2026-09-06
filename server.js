@@ -3,11 +3,17 @@ import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import puppeteer from 'puppeteer'
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
 dotenv.config()
 
 const app = express()
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+app.use(express.static(path.join(__dirname, 'dist')))
 
 app.use(cors())
 app.use(express.json())
@@ -193,6 +199,10 @@ app.post('/api/ai', async (req, res) => {
       error: 'Failed to process AI request'
     })
   }
+})
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'))
 })
 
 const PORT =
