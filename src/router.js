@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-
+import LandingView from './views/LandingView.vue'
 import LoginView from './views/LoginView.vue'
 import RegisterView from './views/RegisterView.vue'
 import {
@@ -17,10 +17,14 @@ const routes = [
   component: RegisterView
 },
   {
-    path: '/',
-    component: () =>
-      import('./views/ResumeView.vue')
-  }
+  path: '/',
+  component: LandingView
+},
+{
+  path: '/app',
+  component: () =>
+    import('./views/ResumeView.vue')
+}
 ]
 
 const router = createRouter({
@@ -31,16 +35,16 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const user = await waitForAuthReady()
 
-  if (to.path === '/' && !user) {
-    return '/login'
-  }
+  if (to.path === '/app' && !user) {
+  return '/login'
+}
 
   if (
   (to.path === '/login' ||
     to.path === '/register') &&
   user
 ) {
-  return '/'
+  return '/app'
 }
 
   return true
