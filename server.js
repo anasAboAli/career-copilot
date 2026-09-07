@@ -7,7 +7,25 @@ import puppeteer from 'puppeteer'
 dotenv.config()
 
 const app = express()
+let browserPromise = null
 
+async function getBrowser() {
+  if (!browserPromise) {
+    browserPromise = puppeteer.launch({
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage'
+      ]
+    }).catch(error => {
+      browserPromise = null
+      throw error
+    })
+  }
+
+  return browserPromise
+}
 app.use(cors({
   origin: [
     'https://career-copilot-rt1j.onrender.com',
@@ -17,12 +35,14 @@ app.use(cors({
 app.use(express.json())
 
 app.post('/api/pdf', async (req, res) => {
+  let page = null
+
   try {
     const {
-  html,
-  name,
-  lang
-} = req.body
+      html,
+      name,
+      lang
+    } = req.body
 
     if (!html || !html.trim()) {
       return res.status(400).json({
@@ -30,28 +50,21 @@ app.post('/api/pdf', async (req, res) => {
       })
     }
 
-    const browser = await puppeteer.launch({
-  headless: true,
-  args: [
-    '--no-sandbox',
-    '--disable-setuid-sandbox',
-    '--disable-dev-shm-usage'
-  ]
-})
+    const browser = await getBrowser()
 
-    const page = await browser.newPage()
+    page = await browser.newPage()
 
     await page.setContent(html, {
       waitUntil: 'networkidle0'
     })
-const pdf = await page.pdf({
-  format: 'A4',
-  printBackground: true,
-  preferCSSPageSize: true
-})
-const pdfBuffer = Buffer.from(pdf)
 
-    await browser.close()
+    const pdf = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      preferCSSPageSize: true
+    })
+
+    const pdfBuffer = Buffer.from(pdf)
 
     res.set({
       'Content-Type': 'application/pdf',
@@ -60,16 +73,29 @@ const pdfBuffer = Buffer.from(pdf)
       'Content-Length': pdfBuffer.length
     })
 
-    res.send(pdfBuffer)
+    return res.send(pdfBuffer)
+
   } catch (error) {
     console.error(
       'PDF generation error:',
       error
     )
 
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to generate PDF'
     })
+
+  } finally {
+    if (page) {
+      try {
+        await page.close()
+      } catch (error) {
+        console.error(
+          'PDF page close error:',
+          error
+        )
+      }
+    }
   }
 })
 
