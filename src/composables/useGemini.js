@@ -1,6 +1,9 @@
+import { API_BASE_URL } from '../config.js'
+
+
 export function useGemini() {
   async function callGemini(prompt) {
-    const res = await fetch('/api/ai', {
+    const res = await fetch(`${API_BASE_URL}/ai`, {
       method: 'POST',
 
       headers: {

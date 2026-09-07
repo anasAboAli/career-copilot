@@ -281,6 +281,7 @@ link: ''
             exp.raw,
             this.lang
           )
+          exp.raw = exp.polished
       } catch (error) {
         console.error(
           'Experience polish error:',

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://career-cv-ai.onrender.com/sitemap.xml
+Sitemap: https://career-copilot-rt1j.onrender.com/sitemap.xml

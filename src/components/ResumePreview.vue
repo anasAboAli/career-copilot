@@ -32,7 +32,7 @@
         </div>
 
         <div class="doc-body">
-          {{ data.summaryPolished || data.summaryRaw }}
+          {{ data.summaryRaw }}
         </div>
       </template>
 
@@ -59,7 +59,7 @@
           </div>
 
           <div class="doc-body">
-            {{ exp.polished || exp.raw }}
+            {{ exp.raw }}
           </div>
         </div>
       </template>
@@ -117,6 +117,7 @@ import { computed } from "vue";
 import { I18N } from "../i18n.js";
 import { useResumeStore } from "../stores/resume.js";
 import { buildResumeHTML } from "../pdf/resumeTemplate.js";
+import { API_BASE_URL } from '../config.js'
 
 const resume = useResumeStore();
 
@@ -136,7 +137,7 @@ async function exportPDF() {
   try {
     const html = buildResumeHTML(resume.data, resume.lang);
 
-    const response = await fetch("/api/pdf", {
+    const response = await fetch(`${API_BASE_URL}/pdf`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

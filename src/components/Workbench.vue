@@ -66,6 +66,8 @@ import ResumePreview from "./ResumePreview.vue";
 import { buildResumeHTML } from "../pdf/resumeTemplate.js";
 import { useAuthStore } from "../stores/auth.js";
 import { deleteResume } from "../services/resume.service.js";
+import { API_BASE_URL } from '../config.js'
+
 const resume = useResumeStore();
 const auth = useAuthStore();
 
@@ -79,7 +81,7 @@ async function exportPDF() {
   try {
     const html = buildResumeHTML(resume.data, resume.lang);
 
-    const response = await fetch("/api/pdf", {
+    const response = await fetch(`${API_BASE_URL}/pdf`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

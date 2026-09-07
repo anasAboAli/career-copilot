@@ -82,7 +82,7 @@ async function handleLogin() {
   try {
     await login(email.value.trim(), password.value);
 
-    await router.push("/");
+    await router.push("/app");
   } catch (error) {
     console.error("Login error:", error);
 
@@ -98,7 +98,7 @@ async function handleRegister() {
 
   try {
     await register(email.value.trim(), password.value);
-    await router.push("/");
+    await router.push("/app");
   } catch (error) {
     console.error("Registration error:", error);
 

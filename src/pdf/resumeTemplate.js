@@ -294,7 +294,7 @@ export function buildResumeHTML(data, lang) {
     </header>
 
     ${
-  data.summaryPolished || data.summaryRaw
+  data.summaryRaw
     ? `
       <section class="section">
         <h2 class="section-title">
@@ -334,7 +334,7 @@ ${
             )
 
             const body = escapeHTML(
-              exp.polished || exp.raw || ''
+              exp.raw || ''
             )
 
             return `
