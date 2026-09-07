@@ -31,8 +31,13 @@ app.post('/api/pdf', async (req, res) => {
     }
 
     const browser = await puppeteer.launch({
-      headless: true
-    })
+  headless: true,
+  args: [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage'
+  ]
+})
 
     const page = await browser.newPage()
 
