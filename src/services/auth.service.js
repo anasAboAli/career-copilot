@@ -2,7 +2,8 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signOut
+  signOut,
+  sendEmailVerification
 } from 'firebase/auth'
 
 import app from '../firebase.js'
@@ -10,21 +11,71 @@ import app from '../firebase.js'
 const auth = getAuth(app)
 
 export async function register(email, password) {
-  return await createUserWithEmailAndPassword(
-    auth,
-    email,
-    password
+  const userCredential =
+    await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    )
+
+  await sendEmailVerification(
+    userCredential.user
   )
+
+  await signOut(auth)
+
+  return userCredential
 }
 
 export async function login(email, password) {
-  return await signInWithEmailAndPassword(
-    auth,
-    email,
-    password
-  )
-}
+  const userCredential =
+    await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    )
 
+  if (!userCredential.user.emailVerified) {
+    await signOut(auth)
+
+    const error = new Error(
+      'Email verification required'
+    )
+
+    error.code = 'auth/email-not-verified'
+
+    throw error
+  }
+
+  return userCredential
+}
+export async function resendVerificationEmail(email, password) {
+
+  const userCredential =
+    await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    )
+
+  if (userCredential.user.emailVerified) {
+    await signOut(auth)
+
+    const error = new Error(
+      'Email already verified'
+    )
+
+    error.code = 'auth/email-already-verified'
+
+    throw error
+  }
+
+  await sendEmailVerification(
+    userCredential.user
+  )
+
+  await signOut(auth)
+}
 export async function logout() {
   return await signOut(auth)
 }
@@ -45,6 +96,9 @@ export function waitForAuthReady() {
 export function getAuthErrorMessage(errorCode, lang) {
   const messages = {
     ar: {
+      'auth/email-not-verified':
+        'يرجى تأكيد بريدك الإلكتروني أولًا. تحقق من صندوق الوارد ثم سجّل الدخول مرة أخرى.',
+
       'auth/invalid-email':
         'البريد الإلكتروني غير صحيح.',
 
@@ -71,11 +125,14 @@ export function getAuthErrorMessage(errorCode, lang) {
     },
 
     en: {
+      'auth/email-not-verified':
+        'Please verify your email first. Check your inbox, then log in again.',
+
       'auth/invalid-email':
         'Please enter a valid email address.',
 
       'auth/missing-password':
-        'Please enter your password.',
+        'Please enter a password.',
 
       'auth/weak-password':
         'Password must be at least 6 characters.',

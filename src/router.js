@@ -35,14 +35,18 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const user = await waitForAuthReady()
 
-  if (to.path === '/app' && !user) {
+if (
+  to.path === '/app' &&
+  (!user || !user.emailVerified)
+) {
   return '/login'
 }
 
-  if (
+if (
   (to.path === '/login' ||
     to.path === '/register') &&
-  user
+  user &&
+  user.emailVerified
 ) {
   return '/app'
 }
