@@ -3,7 +3,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  sendEmailVerification
+  sendEmailVerification,
+  sendPasswordResetEmail
 } from 'firebase/auth'
 
 import app from '../firebase.js'
@@ -48,6 +49,9 @@ export async function login(email, password) {
   }
 
   return userCredential
+}
+export async function resetPassword(email) {
+  await sendPasswordResetEmail(auth, email)
 }
 export async function resendVerificationEmail(email, password) {
 

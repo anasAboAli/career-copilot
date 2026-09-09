@@ -22,6 +22,16 @@
       />
     </div>
 
+    <button
+      v-if="props.mode === 'login'"
+      type="button"
+      class="forgot-password"
+      :disabled="loading"
+      @click="handleResetPassword"
+    >
+      {{ lang === "ar" ? "نسيت كلمة المرور؟" : "Forgot password?" }}
+    </button>
+
     <div class="auth-actions">
       <button
         class="btn-primary"
@@ -38,20 +48,28 @@
       </button>
     </div>
 
-    <p v-if="message" class="auth-message">
-      {{ message }}
-    </p>
+    <div
+  v-if="message"
+  class="auth-message"
+  :class="{ 'verification-message': emailNotVerified }"
+>
+  <div>{{ message }}</div>
 
-    <button
-      v-if="props.mode === 'login' && emailNotVerified"
-      class="btn-secondary"
-      :disabled="loading"
-      @click="handleResendVerification"
-    >
-      {{
-        lang === "ar" ? "إعادة إرسال رسالة التحقق" : "Resend verification email"
-      }}
-    </button>
+  <button
+    v-if="props.mode === 'login' && emailNotVerified"
+    type="button"
+    class="forgot-password"
+    :disabled="loading"
+    @click="handleResendVerification"
+  >
+    {{
+      lang === "ar"
+        ? "إعادة إرسال رسالة التحقق"
+        : "Resend verification email"
+    }}
+  </button>
+</div>
+
   </div>
 </template>
 
@@ -70,6 +88,7 @@ import { useResumeStore } from "../stores/resume.js";
 import {
   login,
   register,
+  resetPassword,
   resendVerificationEmail,
   getAuthErrorMessage,
 } from "../services/auth.service.js";
@@ -107,6 +126,24 @@ async function handleResendVerification() {
       lang.value === "ar"
         ? "تمت إعادة إرسال رسالة التحقق إلى بريدك الإلكتروني."
         : "The verification email has been resent.";
+  } catch (error) {
+    message.value = getAuthErrorMessage(error.code, lang.value);
+  } finally {
+    loading.value = false;
+  }
+}
+
+async function handleResetPassword() {
+  message.value = "";
+  loading.value = true;
+
+  try {
+    await resetPassword(email.value.trim());
+
+    message.value =
+      lang.value === "ar"
+        ? "تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني."
+        : "A password reset link has been sent to your email.";
   } catch (error) {
     message.value = getAuthErrorMessage(error.code, lang.value);
   } finally {

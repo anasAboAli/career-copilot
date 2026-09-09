@@ -701,6 +701,38 @@ footer {
   overflow-wrap: anywhere;
 }
 
+.forgot-password,
+.btn-secondary {
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--ink-line);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--paper-text, var(--ink));
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.forgot-password:hover,
+.btn-secondary:hover {
+  border-width: 2px;
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.forgot-password:disabled,
+.btn-secondary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 @media (max-width: 600px) {
   .auth-page {
     align-items: flex-start;

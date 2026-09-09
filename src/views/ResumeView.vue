@@ -3,21 +3,15 @@
     <!-- Language switch -->
     <LangSwitch />
 
-<div class="account-actions">
-  <span
-    v-if="auth.user?.email"
-    class="user-email"
-  >
-    {{ auth.user.email }}
-  </span>
+    <div class="account-actions">
+      <span v-if="auth.user?.email" class="user-email">
+        {{ auth.user.email }}
+      </span>
 
-  <button
-    class="logout-btn"
-    @click="handleLogout"
-  >
-    {{ t.authLogout }}
-  </button>
-</div>
+      <button class="logout-btn" @click="handleLogout">
+        {{ t.authLogout }}
+      </button>
+    </div>
 
     <!-- HERO -->
     <HeroSection />
@@ -83,10 +77,32 @@
     </section>
 
     <footer>
-      {{ t.footer }}
+      <p id="anasName">{{ t.footer }}</p>
+      <a id="whatsAnas" href="https://wa.me/970598143863" target="_blank">{{
+        t.whatsApp
+      }}</a>
     </footer>
   </div>
 </template>
+
+<style scoped>
+#anasName {
+  font-weight: bold;
+  font-size: 15px;
+  color: white;
+  margin-top: 0;
+}
+#whatsAnas {
+  font-weight: bold;
+  font-size: 15px;
+  color: #7c6ff0;
+  transition: 0.3s;
+  display: inline-block;
+}
+#whatsAnas:hover {
+  transform: scale(1.2);
+}
+</style>
 
 <script setup>
 import { ref, computed, watch } from "vue";
@@ -105,8 +121,8 @@ import ProjectsStep from "../components/steps/ProjectsStep.vue";
 import {
   getResume,
   saveResume,
-  deleteResume
-} from '../services/resume.service.js'
+  deleteResume,
+} from "../services/resume.service.js";
 import { logout } from "../services/auth.service.js";
 
 import { I18N } from "../i18n.js";
@@ -167,35 +183,28 @@ const dir = computed(() => resume.dir);
 
 const t = computed(() => I18N[lang.value]);
 
-let firestoreSaveTimer = null
-let skipNextFirestoreSave = false
+let firestoreSaveTimer = null;
+let skipNextFirestoreSave = false;
 
 function scheduleFirestoreSave() {
-  clearTimeout(firestoreSaveTimer)
+  clearTimeout(firestoreSaveTimer);
 
   if (skipNextFirestoreSave) {
-    skipNextFirestoreSave = false
-    return
+    skipNextFirestoreSave = false;
+    return;
   }
 
   if (!auth.user) {
-    return
+    return;
   }
 
   firestoreSaveTimer = setTimeout(async () => {
     try {
-      await saveResume(
-        auth.user.uid,
-        resume.data,
-        resume.lang
-      )
+      await saveResume(auth.user.uid, resume.data, resume.lang);
     } catch (error) {
-      console.error(
-        'Firestore save error:',
-        error
-      )
+      console.error("Firestore save error:", error);
     }
-  }, 800)
+  }, 800);
 }
 
 watch(
@@ -203,7 +212,7 @@ watch(
   async () => {
     resume.saveToLocalStorage();
 
-    scheduleFirestoreSave()
+    scheduleFirestoreSave();
   },
   { deep: true },
 );
@@ -213,7 +222,7 @@ watch(
   async () => {
     resume.saveToLocalStorage();
 
-    scheduleFirestoreSave()
+    scheduleFirestoreSave();
   },
 );
 

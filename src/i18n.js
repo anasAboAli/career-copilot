@@ -121,7 +121,8 @@ const translations = {
       'Start typing on the left — this page compiles as you go.',
 
     footer:
-      'career-copilot · MVP prototype · built with Vue 3',
+      'Developed by Eng. Anas Alhirthani',
+    whatsApp: 'Click to contact',
 
     reset: 'Reset',
     resetConfirm: 'Are you sure you want to clear your resume and start over?',
@@ -265,7 +266,8 @@ projLinkPh: 'https://example.com',
       'ابدأ بالكتابة على اليسار — ستُبنى الصفحة أمامك مباشرة.',
 
     footer:
-      'career-copilot · نموذج MVP · مبني باستخدام Vue 3',
+      'طوِّر بواسطة م.أنس الحرثاني',
+    whatsApp: 'اضغط للتواصل',
 
     reset: 'إعادة ضبط',
     resetConfirm: 'هل أنت متأكد أنك تريد مسح بيانات السيرة الذاتية والبدء من جديد؟',
