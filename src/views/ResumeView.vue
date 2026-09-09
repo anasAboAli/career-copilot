@@ -4,9 +4,9 @@
     <LangSwitch />
 
     <div class="account-actions">
-      <span v-if="auth.user?.email" class="user-email">
+      <!-- <span v-if="auth.user?.email" class="user-email">
         {{ auth.user.email }}
-      </span>
+      </span> -->
 
       <button class="logout-btn" @click="handleLogout">
         {{ t.authLogout }}
